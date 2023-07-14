@@ -4,3 +4,6 @@ To answer the questions posed by the different departments, I was tasked with qu
 I wrote moderately complex SQL queries to answer various business questions presented by stakeholders.
 I then presented the SQL resutls by creating visualizations to tel a compelling story about the data.
 My findings were summed up in a professional presentation that was reviewed and approved. 
+
+The included "SQL Project Brief" has a complete overview of the questions proposed as well as the 
+requirements I had to deliver on. 
