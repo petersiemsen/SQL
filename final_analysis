@@ -1,0 +1,79 @@
+SELECT A.title AS "Title",
+    SUM(D.amount) AS "Total Amount"
+FROM film A
+INNER JOIN inventory B ON A.film_id = B.film_id
+INNER JOIN rental C ON C.inventory_id = B.inventory_id
+INNER JOIN payment D ON D.rental_id = C.rental_id
+GROUP BY "Title"
+ORDER BY "Total Amount" DESC (or ASC)
+
+------------------------------------------------------------------------
+
+SELECT AVG(rental_duration),
+    MIN(rental_duration),
+    MAX(rental_duration)
+FROM film
+
+------------------------------------------------------------------------
+
+SELECT C.name AS "Category",
+    COUNT(A.film_id) AS "Count"
+FROM film A
+INNER JOIN film_category B ON A.film_id = B.film_id
+INNER JOIN category C ON B.category_id = C.category_id
+WHERE A.rental_duration >= (SELECT AVG(rental_duration) FROM film)
+GROUP BY "Category"
+ORDER BY "Count" DESC
+
+------------------------------------------------------------------------
+
+SELECT E.country,
+    COUNT(DISTINCT A.customer_id) AS "Count",
+    SUM(B.amount) AS "Total Paid"
+FROM customer A
+INNER JOIN payment B ON A.customer_id = B.customer_id
+INNER JOIN address C ON A.address_id = C.address_id
+INNER JOIN city D ON C.city_id = D.city_id
+INNER JOIN country E ON D.country_id = E.country_id
+GROUP BY E.country
+ORDER BY "Count" DESC
+
+------------------------------------------------------------------------
+
+SELECT A.customer_id,
+    SUM(B.amount) AS "Total Amount Paid",
+    A.first_name,
+    A.last_name,
+    E.country
+FROM customer A
+INNER JOIN payment B ON A.customer_id = B.customer_id
+INNER JOIN address C ON A.address_id = C.address_id
+INNER JOIN city D ON C.city_id = D.city_id
+INNER JOIN country E ON D.country_id = E.country_id
+GROUP BY A.customer_id, E.country
+ORDER BY "Total Amount Paid" DESC
+
+------------------------------------------------------------------------
+
+SELECT DISTINCT ON (E.country)
+    A.customer_id,
+    SUM(B.amount) AS "Total Amount Paid",
+    A.first_name,
+    A.last_name,
+    E.country
+FROM customer A
+INNER JOIN payment B ON A.customer_id = B.customer_id
+INNER JOIN address C ON A.address_id = C.address_id
+INNER JOIN city D ON C.city_id = D.city_id
+INNER JOIN country E ON D.country_id = E.country_id
+WHERE E.country IN (SELECT E.country
+    FROM customer A
+    INNER JOIN address C ON A.address_id = C.address_id
+    INNER JOIN city D ON C.city_id = D.city_id
+    INNER JOIN country E ON D.country_id = E.country_id
+    GROUP BY E.country
+    ORDER BY COUNT(A.customer_id) DESC
+    LIMIT 10
+    )
+GROUP BY E.country, A.customer_id, E.country, D.city
+ORDER BY E.country ASC, "Total Amount Paid" DESC
